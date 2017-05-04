@@ -1,3 +1,5 @@
+package com.bbva.caas;
+
 import java.io.ByteArrayInputStream;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -16,9 +18,10 @@ import javax.crypto.spec.SecretKeySpec;
 import org.bouncycastle.util.encoders.Base64;
 import org.junit.Test;
 
-
-
 public class Cham {
+
+	private static final String SECRET_TYPE = "AES";
+	private static final String ALGORITHM = "AES/CBC/PKCS5Padding";
 
 	@Test	
 	public void buildKeyCAAS()
@@ -48,8 +51,8 @@ public class Cham {
 
 		ivParam = new IvParameterSpec(iv);
 
-		key = new SecretKeySpec(transKeyByte,"AES");
-	    cipherDES = Cipher.getInstance("AES/CBC/PKCS5Padding");
+		key = new SecretKeySpec(transKeyByte, SECRET_TYPE);
+	    cipherDES = Cipher.getInstance(ALGORITHM);
 	    cipherDES.init(Cipher.ENCRYPT_MODE, key, ivParam);
 	    datosCifrados = cipherDES.doFinal(keyToByte);
 
@@ -140,16 +143,16 @@ public class Cham {
 
 	/**
 	 *
-	 * @param datos
+	 * @param data
 	 * @return
 	 */
-	private String toHexadecimal(byte [] datos){
+	private String toHexadecimal(byte [] data){
 		String result, cadAux;
 		ByteArrayInputStream input;
 		int read;
 
 		result = "";
-		input = new ByteArrayInputStream(datos);
+		input = new ByteArrayInputStream(data);
 
 		read = input.read();
 		while (read != -1) {
