@@ -15,13 +15,16 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.apache.log4j.Logger;
 import org.bouncycastle.util.encoders.Base64;
 import org.junit.Test;
 
-public class Cham {
+public class Configuration {
 
 	private static final String SECRET_TYPE = "AES";
 	private static final String ALGORITHM = "AES/CBC/PKCS5Padding";
+
+	static final Logger log = Logger.getLogger(Configuration.class);
 
 	@Test	
 	public void buildKeyCAAS()
@@ -29,7 +32,7 @@ public class Cham {
 				BadPaddingException, InvalidAlgorithmParameterException {
 		Random rnd;
 		String transKey, keyTo, password, resHex;
-		byte[] transKeyByte, keyToByte, iv, transKeyToFile, datosCifrados, resByte;
+		byte [] transKeyByte, keyToByte, iv, transKeyToFile, encryptedData, resByte;
 		IvParameterSpec ivParam;
 		SecretKey key;
 		Cipher cipherDES;
@@ -47,20 +50,26 @@ public class Cham {
 
 		transKeyToFile = xorWithKey(transKey.getBytes(), password.getBytes());
 
-	    System.out.println("Transport Key File :"+new String(encodeUrlSafe(transKeyToFile)));
+		log.debug("Transport Key File : " + new String(encodeUrlSafe(transKeyToFile)));
 
 		ivParam = new IvParameterSpec(iv);
 
 		key = new SecretKeySpec(transKeyByte, SECRET_TYPE);
 	    cipherDES = Cipher.getInstance(ALGORITHM);
 	    cipherDES.init(Cipher.ENCRYPT_MODE, key, ivParam);
-	    datosCifrados = cipherDES.doFinal(keyToByte);
+		encryptedData = cipherDES.doFinal(keyToByte);
 
-	    resHex = this.toHexadecimal(iv) + this.toHexadecimal(datosCifrados);
+	    resHex = this.toHexadecimal(iv) + this.toHexadecimal(encryptedData);
 	    resByte = this.hexStringToByteArray(resHex);
 
-		System.out.println("Key ciphered to policy:"+new String(encodeUrlSafe(resByte)));
+		log.debug("Key ciphered to policy:" + new String(encodeUrlSafe(resByte)));
 	}
+
+
+	// **************************
+	// *	PRIVATE METHODS		*
+	// **************************
+
 
 	/**
 	 *
